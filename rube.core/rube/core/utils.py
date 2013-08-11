@@ -20,9 +20,11 @@ import sys
 import os
 import json
 import nose.tools.nontrivial
+from nose.config import Config
 import threading
 import time
 import zmq
+import subprocess
 
 from functools import wraps
 from testconfig import config
@@ -215,4 +217,26 @@ def skip_logout():
             return func(*args, **kw)
         newfunc = nose.tools.nontrivial.make_decorator(func)(newfunc)
         return newfunc
+    return decorate
+
+
+def check_shell(script_name, *script_args_g):
+    """ A decorator. If wrapped test should run a shell script to test that
+    a state change occured properly.
+    """
+    def decorate(func):
+        @wraps(func)
+        def newfunc(*args, **kw):
+            script_args = list(script_args_g)
+            script_args.insert(0, os.path.join(os.getcwd(), script_name))
+            runner = subprocess.Popen(script_args)
+            runner.wait()
+            if runner.returncode is not 0:
+                raise AssertionError("Shell check failed with exitcode %i" %
+                                     runner.returncode)
+
+            return func(*args, **kw)
+        newfunc = nose.tools.nontrivial.make_decorator(func)(newfunc)
+        return newfunc
+
     return decorate

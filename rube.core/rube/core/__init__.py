@@ -31,6 +31,7 @@ from utils import (
     tolerant,
     skip_logout,
     collect_har,
+    check_shell,
 )
 
 selenium_logger = logging.getLogger("selenium.webdriver")
