@@ -32,3 +32,16 @@ def test_expects_fedmsg():
 @rube.core.tolerant()
 def test_tolerant():
     raise AssertionError("This should fail")
+
+@raises(AssertionError)
+@rube.core.check_shell("rube/core/tests/always_error.sh")
+def test_check_shell_bad():
+    """ Test that the decorator exits out with a bad exit code
+    """
+    pass
+
+@rube.core.check_shell("rube/core/tests/always_okay.sh")
+def test_check_shell_good():
+    """ Test that the decorator exits out with a good (0) exit code
+    """
+    pass
